@@ -34,7 +34,7 @@ def identity(x):
         >>> identity([1, 2, 3])
         [1, 2, 3]
     """
-    pass  # Replace with your implementation
+    return x  # Replace with your implementation
 
 
 def first(seq):
@@ -55,7 +55,8 @@ def first(seq):
 
     Hint: How do you safely get the first element of any iterable?
     """
-    pass
+
+    return next(iter(seq))
 
 
 def second(seq):
@@ -74,7 +75,7 @@ def second(seq):
         >>> second("hello")
         'e'
     """
-    pass
+    return seq[1]
 
 
 def last(seq):
@@ -95,7 +96,7 @@ def last(seq):
 
     Hint: Can you do this without converting the entire iterable to a list?
     """
-    pass
+    return seq[-1]
 
 
 def nth(n, seq):
@@ -118,7 +119,7 @@ def nth(n, seq):
     Raises:
         IndexError: If n is out of bounds
     """
-    pass
+    return seq[n]
 
 
 def count(seq):
@@ -142,7 +143,7 @@ def count(seq):
 
     Hint: You'll need to consume the entire iterable to count it.
     """
-    pass
+    return len(seq)
 
 
 def frequencies(seq):
@@ -165,7 +166,10 @@ def frequencies(seq):
 
     Hint: Build a dictionary from scratch, updating counts as you iterate.
     """
-    pass
+    freq = {}
+    for s in seq:
+        freq[s] = freq.get(s, 0) + 1
+    return freq
 
 
 def groupby(key, seq):
@@ -190,7 +194,11 @@ def groupby(key, seq):
 
     Hint: Similar to frequencies, but storing lists of items instead of counts.
     """
-    pass
+    group = {}
+    for s in seq:
+        func = key(s)
+        group.setdefault(func, []).append(s)
+    return group
 
 
 def cons(el, seq):
@@ -215,7 +223,10 @@ def cons(el, seq):
 
     Hint: This should return a list, not a generator.
     """
-    pass
+    lst = [el]
+    for s in seq:
+        lst.append(s)
+    return lst
 
 
 def merge(*dicts):
@@ -239,4 +250,7 @@ def merge(*dicts):
 
     Hint: Iterate through dicts and update a result dictionary.
     """
-    pass
+    my_dict = {}
+    for i in dicts:
+        my_dict.update(i)
+    return my_dict

@@ -36,7 +36,17 @@ def take(n, seq):
 
     Hint: Use 'yield' and enumerate or a counter to track how many items yielded
     """
-    pass
+    lst = []
+    counter = 0
+    while counter <= len(seq):
+        lst.append(seq[counter])
+        yield counter
+        counter += 1
+        if counter > n:
+            break
+
+    return lst
+
 
 
 def iterate(func, x):

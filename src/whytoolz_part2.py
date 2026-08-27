@@ -19,7 +19,27 @@ Focus on:
 
 See: https://toolz.readthedocs.io/en/latest/api.html#itertoolz
 """
+def zip_longest(*iterables, fillvalue=None):
+    # zip_longest('ABCD', 'xy', fillvalue='-') → Ax By C- D-
 
+    iterators = list(map(iter, iterables))
+    num_active = len(iterators)
+    if not num_active:
+        return
+
+    while True:
+        values = []
+        for i, iterator in enumerate(iterators):
+            try:
+                value = next(iterator)
+            except StopIteration:
+                num_active -= 1
+                if not num_active:
+                    return
+                iterators[i] = repeat(fillvalue)
+                value = fillvalue
+            values.append(value)
+        yield list(values)
 
 def islice(seq, *args):
     """
@@ -52,7 +72,16 @@ def islice(seq, *args):
     Hint: Parse the *args to determine start, stop, and step values,
           then iterate through the sequence collecting appropriate elements into a list.
     """
-    pass
+    lst = list(seq)
+    if len(args) == 1:
+        stop = args[0]
+        return lst[:stop]
+    if len(args) == 2:
+        start, stop = args
+        return lst[start:stop]
+    if len(args) == 3:
+        start, stop, step = args
+        return lst[start:stop:step]
 
 
 def drop(n, seq):
@@ -76,7 +105,11 @@ def drop(n, seq):
 
     Hint: Use islice with a start parameter
     """
-    pass
+
+    lst = list(seq)
+    for item in lst[:n]:
+        lst.remove(item)
+    return lst
 
 
 def tail(n, seq):
@@ -102,7 +135,11 @@ def tail(n, seq):
 
     Hint: Use collections.deque with maxlen, or convert to list and slice
     """
-    pass
+    lst = list(seq)
+    if n == 0:
+        return []
+    return lst[-n:]
+
 
 
 def concat(seqs):
@@ -126,7 +163,16 @@ def concat(seqs):
 
     Hint: Nested loops to collect elements, or flatten the sequences
     """
-    pass
+
+    lst = list(seqs)
+    sub_list = []
+    flat_list = []
+    for sub_list in lst:
+        for item in sub_list:
+            flat_list.append(item)
+    return flat_list
+
+
 
 
 def unique(seq):
@@ -149,7 +195,12 @@ def unique(seq):
 
     Hint: Keep a set of seen elements, only collect if not seen before
     """
-    pass
+    lst = []
+    for item in seq:
+        if item not in lst:
+            lst.append(item)
+    return lst
+
 
 
 def partition(n, seq):
@@ -175,7 +226,20 @@ def partition(n, seq):
 
     Hint: Use islice in a loop to grab n items at a time
     """
-    pass
+    lst = list(seq)
+    count = 0
+    part_list = []
+
+    while count < len(lst):
+        stop = count + n
+        group = islice(lst, count, stop)
+        part_list.append(tuple(group))
+
+        count += n
+
+    return part_list
+
+
 
 
 def interleave(seqs):
@@ -199,7 +263,13 @@ def interleave(seqs):
 
     Hint: Use zip_longest to handle sequences of different lengths
     """
-    pass
+    lst = list(seqs)
+    zipped_list = []
+
+    max_len = max(len(sub_list) for sub_list in lst)
+
+    for index in range(max_len):
+
 
 
 def pluck(key, seq):
