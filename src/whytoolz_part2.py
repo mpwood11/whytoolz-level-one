@@ -19,27 +19,10 @@ Focus on:
 
 See: https://toolz.readthedocs.io/en/latest/api.html#itertoolz
 """
-def zip_longest(*iterables, fillvalue=None):
-    # zip_longest('ABCD', 'xy', fillvalue='-') → Ax By C- D-
+from itertools import zip_longest
 
-    iterators = list(map(iter, iterables))
-    num_active = len(iterators)
-    if not num_active:
-        return
+from collections import deque
 
-    while True:
-        values = []
-        for i, iterator in enumerate(iterators):
-            try:
-                value = next(iterator)
-            except StopIteration:
-                num_active -= 1
-                if not num_active:
-                    return
-                iterators[i] = repeat(fillvalue)
-                value = fillvalue
-            values.append(value)
-        yield list(values)
 
 def islice(seq, *args):
     """
@@ -264,11 +247,18 @@ def interleave(seqs):
     Hint: Use zip_longest to handle sequences of different lengths
     """
     lst = list(seqs)
-    zipped_list = []
-
-    max_len = max(len(sub_list) for sub_list in lst)
+    interleaved_list = []
+    max_len = 0
+    for sublist in lst:
+        if len(sublist) > max_len:
+            max_len = len(sublist)
 
     for index in range(max_len):
+        for sublist in lst:
+            if index < len(sublist):
+                interleaved_list.append(sublist[index])
+    return interleaved_list
+
 
 
 
@@ -295,7 +285,8 @@ def pluck(key, seq):
 
     Hint: Use a list comprehension to extract values
     """
-    pass
+
+    return [dic[key] for dic in seq]
 
 
 def accumulate(func, seq, initial=None):
@@ -321,7 +312,19 @@ def accumulate(func, seq, initial=None):
 
     Hint: Keep a running accumulator, collect results at each step
     """
-    pass
+    acc_list = []
+
+    if initial is None:
+        flat_seq = seq
+    else:
+        flat_seq = [initial] + seq
+    for i in flat_seq:
+      if flat_seq.index(i) == 0:
+       acc_list.append(i)
+      else:
+       acc_list.append(func(acc_list[-1], i))
+
+    return acc_list
 
 
 def sliding_window(n, seq):
@@ -346,7 +349,18 @@ def sliding_window(n, seq):
 
     Hint: Use collections.deque with maxlen to maintain the window
     """
-    pass
+    slide_list = []
+    if n > len(seq):
+        return []
+
+    for index in range(len(seq) - n + 1):
+        small_lst = []
+        for i in range(n):
+            small_lst.append(seq[index+i])
+        slide_list.append(tuple(small_lst)) # Changed to append tuple
+
+    return slide_list
+
 
 
 def take_nth(n, seq):
@@ -370,4 +384,8 @@ def take_nth(n, seq):
 
     Hint: Use enumerate to track position, collect when position % n == 0
     """
-    pass
+    nth_list = []
+    for index, elem in enumerate(seq):
+        if index % n == 0:
+            nth_list.append(elem)
+    return nth_list

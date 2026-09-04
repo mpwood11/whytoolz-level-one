@@ -43,7 +43,11 @@ def pipe(data, *funcs):
 
     Hint: You could use a loop...
     """
-    pass
+    result = data
+
+    for func in funcs:
+        result = func(result)
+    return result
 
 
 def compose(*funcs):
@@ -68,7 +72,16 @@ def compose(*funcs):
 
     Hint: Return a function that calls each func in reverse order
     """
-    pass
+    def compose_new(funx):
+        result = funx
+        # Apply functions from right to left
+        for func in reversed(funcs):
+            result = func(result)
+        return result
+    return compose_new
+
+
+
 
 
 def complement(func):
@@ -94,7 +107,11 @@ def complement(func):
 
     Hint: Return a function that calls func and negates the result
     """
-    pass
+    def reverse_func(*f):
+
+        return not func(*f)
+
+    return reverse_func
 
 
 def do(func, x):
@@ -120,7 +137,11 @@ def do(func, x):
 
     Hint: Call func(x), ignore result, return x
     """
-    pass
+    func(x)
+
+    return x
+
+
 
 
 def memoize(func):
@@ -150,7 +171,16 @@ def memoize(func):
 
     Hint: Use a dictionary to store {args: result} pairs
     """
-    pass
+
+    cache = {}
+    def cached(*args):
+        if args not in cache:
+            cache[args] = func(*args)
+            return cache[args]
+        else:
+            return cache[args]
+    return cached
+
 
 
 def assoc(d, key, value):
@@ -175,7 +205,10 @@ def assoc(d, key, value):
 
     Hint: Create a copy of d and add the key-value pair
     """
-    pass
+    nd = {}
+    nd.update(d)
+    nd[key] = value
+    return nd
 
 
 def dissoc(d, *keys):
@@ -199,7 +232,13 @@ def dissoc(d, *keys):
 
     Hint: Create a copy and remove keys, or use dict comprehension
     """
-    pass
+    nd = {}
+    nd.update(d)
+    for key in keys:
+        if key in nd:
+            nd.pop(key)
+
+    return nd
 
 
 def valmap(func, d):
@@ -224,7 +263,10 @@ def valmap(func, d):
 
     Hint: Use dict comprehension
     """
-    pass
+    nd = {}
+    nd.update(zip(d.keys(), map(func, d.values())))
+
+    return nd
 
 
 def keymap(func, d):
@@ -249,7 +291,9 @@ def keymap(func, d):
 
     Hint: Use dict comprehension
     """
-    pass
+    nd = {}
+    nd.update(zip(map(func, d.keys()), d.values()))
+    return nd
 
 
 def valfilter(predicate, d):
@@ -274,7 +318,12 @@ def valfilter(predicate, d):
 
     Hint: Use dict comprehension with if clause
     """
-    pass
+    nd = {}
+    for k, v in d.items():
+        if predicate(v):
+            nd[k] = v
+
+    return nd
 
 
 def get_in(keys, d, default=None):
@@ -301,7 +350,15 @@ def get_in(keys, d, default=None):
 
     Hint: Use a loop or recursion to traverse the path
     """
-    pass
+    nd = d
+    for key in keys:
+        if isinstance(nd, dict) and key in nd:
+            nd = nd[key]
+        else:
+            return default
+    return nd
+
+
 
 
 def update_in(d, keys, func):
@@ -324,7 +381,23 @@ def update_in(d, keys, func):
         >>> data = {'a': {'b': {'c': 1}}}
         >>> update_in(data, ['a', 'b', 'c'], lambda x: x + 10)
         {'a': {'b': {'c': 11}}}
+        >>> data2 = {'a': {'b': 1, 'c': 2}, 'd': 3}
+        >>> update_in(data2, ['a', 'b'], lambda x: x * 2)
+        {'a': {'b': 2, 'c': 4}, 'd': 3}
 
     Hint: This is tricky! You need to recursively copy and update nested dicts
     """
-    pass
+    nd = d
+    if not keys:
+        return func(nd)
+    else:
+        key = keys[0]
+        if key in d:
+            updated_value = update_in(nd[key], keys[1:], func)
+            return assoc(nd, key, updated_value)
+        else:
+            # If the key doesn't exist, we can choose to create a new nested dict
+            # or raise an error. Here, we'll create a new nested dict.
+            new_dict = update_in({}, keys[1:], func)
+            return assoc(nd, key, new_dict)
+
